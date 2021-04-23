@@ -6,4 +6,5 @@ services:
     ports:
       - 8000:8000
     volumes:
-      - .:/github-oauth-1
+      - .:/github-oauth 
+
