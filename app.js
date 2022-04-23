@@ -3,11 +3,11 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-var helmet = require('helmet');
+const helmet = require('helmet');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var photosRouter = require('./routes/photos');
+const photosRouter = require('./routes/photos');
 
 var app = express();
 app.use(helmet());
