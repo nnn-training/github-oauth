@@ -9,9 +9,12 @@
     "cookie-parser": "1.4.6",
     "debug": "4.3.4",
     "express": "4.18.2",
+    "express-session": "1.17.3",
     "helmet": "6.1.5",
     "http-errors": "2.0.0",
     "morgan": "1.10.0",
+    "passport": "0.6.0",
+    "passport-github2": "0.1.12",
     "pug": "3.0.2"
   }
 }
