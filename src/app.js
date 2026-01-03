@@ -11,6 +11,7 @@ const { serveStatic } = require("@hono/node-server/serve-static");
 const { trimTrailingSlash } = require("hono/trailing-slash");
 const { githubAuth } = require('@hono/oauth-providers/github');
 const { getIronSession } = require('iron-session');
+const layout = require('./layout');
 
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
@@ -54,24 +55,41 @@ app.get('/auth/github', async (c) => {
   return c.redirect('/');
 });
 
+// ブラウザで /login にアクセスするとログイン用のHTMLページを返す
+app.get('/login', (c) => {
+  return c.html(
+    layout(
+      'Login',
+      html`
+        <h1>Login</h1>
+        <a href="/auth/github">GitHubでログイン</a>
+      `,
+    )
+  );
+});
+
+// /logout にアクセスするとログイン情報（セッション）を削除
+app.get('/logout', (c) => {
+  const session = c.get('session');
+  session.destroy();
+  return c.redirect('/');
+});
+
 app.route("/", indexRouter);
 app.route("/users", usersRouter);
 app.route("/photos", photosRouter);
 
 app.notFound((c) => {
   return c.html(
-    html`
-      <!doctype html>
-      <html>
-        <head>
-          <title>Not Found</title>
-        </head>
-        <body>
-          <h1>Not Found</h1>
-          <p>${c.req.url} の内容が見つかりませんでした。</p>
-        </body>
-      </html>
-    `,
+    layout(
+      'Not Found',
+      html`
+        <h1>Not Found</h1>
+        <p>
+          ${c.req.url}の内容が見つかりませんでした。
+        </p>
+      `,
+    ),
     404,
   );
 });
@@ -80,20 +98,15 @@ app.onError((error, c) => {
   const statusCode = error instanceof HTTPException ? error.status : 500;
   const { NODE_ENV } = env(c);
   return c.html(
-    html`
-      <!doctype html>
-      <html>
-        <head>
-          <title>Error</title>
-        </head>
-        <body>
-          <h1>Error</h1>
-          <h2>${error.name} (${statusCode})</h2>
-          <p>${error.message}</p>
-          ${NODE_ENV === "development" ? html`<pre>${error.stack}</pre>` : ""}
-        </body>
-      </html>
-    `,
+    layout(
+      'Error',
+      html`
+      <h1>Error</h1>
+      <h2>${error.name} (${statusCode})</h2>
+      <p>${error.message}</p>
+      ${NODE_ENV === 'development' ? html`<pre>${error.stack}</pre>` : ''}
+      `,
+    ),
     statusCode,
   );
 });
